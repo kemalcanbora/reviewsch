@@ -1,0 +1,120 @@
+definitions:
+  api.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  api.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  entity.Basket:
+    description: Shopping basket with coupon application details
+    properties:
+      applicationSuccessful:
+        example: true
+        type: boolean
+      appliedDiscount:
+        example: 10
+        type: integer
+      couponCode:
+        example: SUMMER2024
+        type: string
+      value:
+        example: 100.5
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/apply:
+    get:
+      description: Apply a coupon to a basket
+      parameters:
+      - description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Basket'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Apply a coupon to a basket
+      tags:
+      - Coupons
+  /v1/coupons:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve multiple coupons by their codes
+      parameters:
+      - description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: objects
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get coupons by codes
+      tags:
+      - Coupons
+  /v1/create:
+    post:
+      description: Create a new coupon
+      parameters:
+      - description: Bearer JWT token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new coupon
+      tags:
+      - Coupons
+swagger: "2.0"

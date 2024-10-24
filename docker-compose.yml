@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  coupon_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coupon_service
+    ports:
+      - "8080:8080"
+    environment:
+      - GIN_MODE=release
+      - TZ=UTC
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - coupon_network
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+  redis:
+    image: redis:6.0.9-alpine
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    env_file: .env
+    entrypoint: redis-server --appendonly yes  --requirepass ${REDIS_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    networks:
+      - coupon_network
+
+
+networks:
+  coupon_network:
+    driver: bridge
+
+volumes:
+  redis_data:
